@@ -1,21 +1,25 @@
 import * as sass from "sass";
-import * as esbuild from "esbuild";
 
 const result = sass.compile("src/styles/style.scss");
 await Bun.write("src/public/themes/degoog-theme/style.css", result.css);
 console.log("SCSS compiled successfully.");
 
-await esbuild.build({
-  entryPoints: [
-    { in: "src/client/app.ts", out: "app" },
-    { in: "src/client/modules/settings/settings.ts", out: "settings-page" },
+const buildResult = await Bun.build({
+  entrypoints: [
+    "src/client/app.ts",
+    "src/client/modules/settings/settings.ts",
   ],
-  bundle: true,
   outdir: "src/public",
+  target: "browser",
   format: "esm",
-  target: ["es2022"],
-  minify: false,
-  sourcemap: false,
+  splitting: true,
+  minify: true,
+  sourcemap: true,
 });
+
+if (!buildResult.success) {
+  console.error("Build failed:", buildResult.logs);
+  process.exit(1);
+}
 
 console.log("TypeScript bundled successfully.");
