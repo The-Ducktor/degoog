@@ -1,25 +1,38 @@
-import * as sass from "sass";
+import sass from "sass";
 
+// --- SCSS ---
 const result = sass.compile("src/styles/style.scss");
 await Bun.write("src/public/themes/degoog-theme/style.css", result.css);
 console.log("SCSS compiled successfully.");
 
-const buildResult = await Bun.build({
-  entrypoints: [
-    "src/client/app.ts",
-    "src/client/modules/settings/settings.ts",
-  ],
+// --- TypeScript bundling ---
+
+// --- app bundle ---
+await Bun.build({
+  entrypoints: ["src/client/app.ts"],
   outdir: "src/public",
-  target: "browser",
+  bundle: true,
   format: "esm",
   splitting: true,
   minify: true,
-  sourcemap: false,
+
+  target: "browser",
+  naming: {
+    entry: "app.js",
+  },
 });
 
-if (!buildResult.success) {
-  console.error("Build failed:", buildResult.logs);
-  process.exit(1);
-}
-
+// --- settings bundle
+await Bun.build({
+  entrypoints: ["src/client/modules/settings/settings.ts"],
+  outdir: "src/public",
+  bundle: true,
+  format: "esm",
+  target: "browser",
+  splitting: false,
+  minify: true,
+  naming: {
+    entry: "settings-page.js",
+  },
+});
 console.log("TypeScript bundled successfully.");
