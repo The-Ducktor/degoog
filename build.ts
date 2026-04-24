@@ -14,7 +14,7 @@ const buildResult = await Bun.build({
   format: "esm",
   splitting: true,
   minify: true,
-  sourcemap: true,
+  sourcemap: false,
 });
 
 if (!buildResult.success) {
